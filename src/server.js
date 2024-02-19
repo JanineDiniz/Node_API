@@ -1,14 +1,21 @@
 require("express-async-errors")
+require("dotenv/config")
 
 const migrationsRun = require("./database/sqlite/migrations")
 const AppError = require("./utils/AppError")
+const uploadConfig = require("./configs/upload")
+
+const cors = require("cors")
 const express = require("express");
 const routes = require("./routes")
 
 migrationsRun()
 
 const app = express()
+app.use(cors())
 app.use(express.json())
+
+app.use("/files", express.static(uploadConfig.UPLOADS_FOLDER))
 
 app.use(routes)
 
@@ -29,20 +36,7 @@ console.error(error);
 
 })
 
-// app.get("/message/:id/:user", (request, response) => {
-//   const {id, user} = request.params
 
-//   response.send(`Id da mensagem: ${id}. Para o usuário: ${user}`)
-// })
-
-// app.get("/users", (request, response) => {
-//   const {page, limit} = request.query
-
-//   response.send(`Página: ${page}. Mostrar: ${limit}`)
-// })
-
-
-
-const port = 3333
+const port = process.env.PORT || 3333
 
 app.listen(port, () => console.log(`Server is running on Port ${port}`) )
